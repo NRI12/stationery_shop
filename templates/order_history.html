@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4>My Account</h4>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                        Profile Information
+                    </a>
+                    <a href="{{ url_for('order_history') }}" class="list-group-item list-group-item-action active">
+                        Order History
+                    </a>
+                    <a href="{{ url_for('change_password') }}" class="list-group-item list-group-item-action">
+                        Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Order History</h3>
+                </div>
+                <div class="card-body">
+                    {% if order_details %}
+                        {% for order_info in order_details %}
+                        <div class="card mb-3">
+                            <div class="card-header d-flex justify-content-between">
+                                <span>Order #{{ order_info.order.id }}</span>
+                                <span class="badge bg-{{ 'success' if order_info.order.status == 'Completed' else 'warning' }}">
+                                    {{ order_info.order.status }}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Order Date:</strong> {{ order_info.order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                                        <p><strong>Total Price:</strong> ${{ "%.2f"|format(order_info.order.total_price) }}</p>
+                                    </div>
+                                </div>
+                                
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order_info.items %}
+                                        <tr>
+                                            <td>
+                                                <img src="{{ item.product.image_url or url_for('static', filename='images/default-product.jpg') }}" 
+                                                     alt="{{ item.product.name }}" style="max-width: 50px; margin-right: 10px;">
+                                                {{ item.product.name }}
+                                            </td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>${{ "%.2f"|format(item.price) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            You have no order history yet. <a href="{{ url_for('product_list') }}">Start Shopping</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

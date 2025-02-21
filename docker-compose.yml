@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:///stationery_shop.db
+      - SECRET_KEY=your_secret_key_here
+      - STRIPE_SECRET_KEY=your_stripe_secret_key
+    volumes:
+      - .:/app
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+    restart: always
+
+volumes:
+  database_data:
